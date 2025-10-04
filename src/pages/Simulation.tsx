@@ -8,49 +8,98 @@ import HabitatVisual from "@/components/HabitatVisual";
 import EventDialog, { GameEvent } from "@/components/EventDialog";
 import type { MissionConfig } from "./MissionSetup";
 import type { ZoneAllocations } from "./ZoneAllocation";
+import { generateCrew, updateCrewStats, type CrewMember } from "@/utils/crewGenerator";
 
-const EVENTS: GameEvent[] = [
+const EASY_EVENTS: GameEvent[] = [
   {
     id: 1,
+    title: "Minor Equipment Check",
+    description: "Routine maintenance reveals a minor issue with the air filtration system.",
+    optionA: "Schedule immediate repair during next maintenance window",
+    optionB: "Monitor the system closely and address if it worsens",
+  },
+  {
+    id: 2,
+    title: "Food Variety Request",
+    description: "The crew is requesting more variety in their meals.",
+    optionA: "Use extra rations to prepare special meals",
+    optionB: "Explain resource constraints and maintain standard menu",
+  },
+  {
+    id: 3,
+    title: "Recreation Time",
+    description: "Crew members want to organize a movie night.",
+    optionA: "Approve and encourage team bonding activities",
+    optionB: "Suggest they stay focused on mission tasks",
+  },
+];
+
+const MEDIUM_EVENTS: GameEvent[] = [
+  {
+    id: 4,
     title: "Solar Flare Warning",
-    description: "A massive solar flare is approaching. Radiation levels will spike significantly.",
+    description: "A moderate solar flare is approaching. Radiation levels will spike.",
     optionA: "Shelter crew in the most shielded areas and reduce power consumption",
     optionB: "Boost electromagnetic shielding at the cost of stored power reserves",
   },
   {
-    id: 2,
-    title: "Food Supply Issue",
-    description: "Hydroponics system shows signs of contamination. Food production may be affected.",
+    id: 5,
+    title: "Hydroponics Contamination",
+    description: "Contamination detected in hydroponics. Food production may be affected.",
     optionA: "Ration food supplies and rely on stored reserves",
     optionB: "Expand the greenhouse area by converting some recreation space",
   },
   {
-    id: 3,
-    title: "Crew Morale Declining",
-    description: "Extended isolation is taking a toll on crew mental health.",
-    optionA: "Organize team-building activities and increase recreation time",
-    optionB: "Implement strict work schedules to maintain productivity",
-  },
-  {
-    id: 4,
+    id: 6,
     title: "Water Recycling Malfunction",
     description: "The water reclamation system efficiency has dropped by 30%.",
     optionA: "Reduce water usage across all systems and crew activities",
     optionB: "Divert maintenance resources to fix the system immediately",
   },
   {
-    id: 5,
-    title: "Medical Emergency",
-    description: "A crew member has fallen ill with an unknown condition.",
-    optionA: "Quarantine the crew member and monitor all others closely",
-    optionB: "Use experimental treatment from the medical bay's research supplies",
+    id: 7,
+    title: "Crew Morale Declining",
+    description: "Extended isolation is affecting crew mental health.",
+    optionA: "Organize team-building activities and increase recreation time",
+    optionB: "Implement strict work schedules to maintain productivity",
+  },
+];
+
+const HARD_EVENTS: GameEvent[] = [
+  {
+    id: 8,
+    title: "Critical Solar Storm",
+    description: "A massive X-class solar flare is inbound. Radiation will reach dangerous levels. Systems may fail.",
+    optionA: "Emergency shutdown of non-essential systems, full crew shelter protocol",
+    optionB: "Attempt to maintain partial operations while reinforcing critical shielding",
   },
   {
-    id: 6,
-    title: "Power Generation Drop",
-    description: "Solar panel efficiency has decreased due to micro-meteorite damage.",
-    optionA: "Reduce non-essential power usage and dim lighting",
-    optionB: "Conduct an EVA to repair the damaged panels (uses maintenance resources)",
+    id: 9,
+    title: "Cascading System Failure",
+    description: "Life support malfunction triggered secondary failures. Oxygen production dropping rapidly.",
+    optionA: "Emergency repair using all maintenance reserves, pause other operations",
+    optionB: "Ration oxygen while attempting partial repairs with available resources",
+  },
+  {
+    id: 10,
+    title: "Medical Emergency",
+    description: "A crew member has collapsed with unknown symptoms. Possibly contagious.",
+    optionA: "Quarantine patient, run full diagnostics, use experimental treatment",
+    optionB: "Treat symptomatically, monitor all crew, preserve medical supplies",
+  },
+  {
+    id: 11,
+    title: "Critical Power Failure",
+    description: "Micro-meteorite damage has disabled 40% of solar panels. Power reserves depleting.",
+    optionA: "Immediate EVA repair mission (high risk, uses maintenance)",
+    optionB: "Reduce all systems to minimum, implement rotating brownouts",
+  },
+  {
+    id: 12,
+    title: "Psychological Crisis",
+    description: "Multiple crew members showing signs of severe depression and conflict. Team cohesion breaking down.",
+    optionA: "Mandatory counseling sessions, increase recreation, reduce work hours",
+    optionB: "Separate conflicting parties, maintain schedules, prioritize mission objectives",
   },
 ];
 
@@ -68,6 +117,7 @@ const Simulation = () => {
   const [currentEvent, setCurrentEvent] = useState<GameEvent | null>(null);
   const [eventChoices, setEventChoices] = useState<Array<{ eventId: number; choice: string }>>([]);
   const [usedEventIds, setUsedEventIds] = useState<Set<number>>(new Set());
+  const [crew, setCrew] = useState<CrewMember[]>([]);
 
   // Stats state
   const [stats, setStats] = useState({
@@ -78,6 +128,13 @@ const Simulation = () => {
     morale: 100,
     repairs: 100,
   });
+
+  // Initialize crew
+  useEffect(() => {
+    if (missionConfig) {
+      setCrew(generateCrew(missionConfig.crewSize));
+    }
+  }, [missionConfig]);
 
   useEffect(() => {
     if (!missionConfig || !zoneAllocations) {
@@ -117,7 +174,17 @@ const Simulation = () => {
   }, [isRunning, currentEvent, speed, missionConfig.duration]);
 
   const triggerRandomEvent = () => {
-    const availableEvents = EVENTS.filter((e) => !usedEventIds.has(e.id));
+    // Select events based on difficulty
+    let eventPool: GameEvent[] = [];
+    if (missionConfig.difficulty === "easy") {
+      eventPool = EASY_EVENTS;
+    } else if (missionConfig.difficulty === "medium") {
+      eventPool = MEDIUM_EVENTS;
+    } else {
+      eventPool = HARD_EVENTS;
+    }
+
+    const availableEvents = eventPool.filter((e) => !usedEventIds.has(e.id));
     if (availableEvents.length > 0) {
       const randomEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
       setCurrentEvent(randomEvent);
@@ -174,21 +241,29 @@ const Simulation = () => {
 
   const updateStats = () => {
     setStats((prev) => {
-      // Calculate decay rates based on allocations
+      // Calculate decay rates based on allocations and difficulty
+      const difficultyMultiplier = missionConfig.difficulty === "hard" ? 1.3 : 
+                                   missionConfig.difficulty === "easy" ? 0.7 : 1.0;
+      
       const lifeDecay = Math.max(0, (20 - zoneAllocations.lifeSupport) / 20);
       const foodDecay = Math.max(0, (15 - zoneAllocations.food) / 15);
       const hygieneDecay = Math.max(0, (10 - zoneAllocations.hygiene) / 10);
       const recreationImpact = Math.max(0, (10 - zoneAllocations.recreation) / 10);
       const maintenanceDecay = Math.max(0, (10 - zoneAllocations.maintenance) / 10);
 
-      return {
-        oxygen: Math.max(0, prev.oxygen - lifeDecay * 0.5),
-        water: Math.max(0, prev.water - hygieneDecay * 0.3),
-        food: Math.max(0, prev.food - foodDecay * 0.4),
-        power: Math.max(0, prev.power - 0.3),
-        morale: Math.max(0, prev.morale - recreationImpact * 0.2),
-        repairs: Math.max(0, prev.repairs - maintenanceDecay * 0.2),
+      const newStats = {
+        oxygen: Math.max(0, prev.oxygen - lifeDecay * 0.5 * difficultyMultiplier),
+        water: Math.max(0, prev.water - hygieneDecay * 0.3 * difficultyMultiplier),
+        food: Math.max(0, prev.food - foodDecay * 0.4 * difficultyMultiplier),
+        power: Math.max(0, prev.power - 0.3 * difficultyMultiplier),
+        morale: Math.max(0, prev.morale - recreationImpact * 0.2 * difficultyMultiplier),
+        repairs: Math.max(0, prev.repairs - maintenanceDecay * 0.2 * difficultyMultiplier),
       };
+
+      // Update crew stats based on habitat performance
+      setCrew((prevCrew) => updateCrewStats(prevCrew, newStats, zoneAllocations, missionConfig.difficulty));
+
+      return newStats;
     });
   };
 
@@ -200,6 +275,7 @@ const Simulation = () => {
         zoneAllocations,
         finalStats: stats,
         eventChoices,
+        crew,
       },
     });
   };

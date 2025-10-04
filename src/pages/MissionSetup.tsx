@@ -10,6 +10,7 @@ export interface MissionConfig {
   destination: string;
   crewSize: number;
   duration: number;
+  difficulty: "easy" | "medium" | "hard";
 }
 
 const MissionSetup = () => {
@@ -18,15 +19,16 @@ const MissionSetup = () => {
     destination: "",
     crewSize: 0,
     duration: 0,
+    difficulty: "medium",
   });
 
   const handleStart = () => {
-    if (config.destination && config.crewSize && config.duration) {
-      navigate("/allocation", { state: { missionConfig: config } });
+    if (config.destination && config.crewSize && config.duration && config.difficulty) {
+      navigate("/tutorial", { state: { missionConfig: config } });
     }
   };
 
-  const isValid = config.destination && config.crewSize && config.duration;
+  const isValid = config.destination && config.crewSize && config.duration && config.difficulty;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 scanlines">
@@ -114,6 +116,44 @@ const MissionSetup = () => {
                   <SelectItem value="180">180 Days (6 Months)</SelectItem>
                   <SelectItem value="365">365 Days (1 Year)</SelectItem>
                   <SelectItem value="730">730 Days (2 Years)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Difficulty */}
+            <div className="space-y-3">
+              <Label htmlFor="difficulty" className="text-lg font-semibold text-foreground">
+                Difficulty Level
+              </Label>
+              <Select
+                value={config.difficulty}
+                onValueChange={(value: "easy" | "medium" | "hard") => setConfig({ ...config, difficulty: value })}
+              >
+                <SelectTrigger 
+                  id="difficulty"
+                  className="w-full h-12 bg-muted/30 border-primary/30 focus:border-primary"
+                >
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-primary/30">
+                  <SelectItem value="easy">
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Easy</span>
+                      <span className="text-xs text-muted-foreground">Forgiving grading, clear outcomes</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="medium">
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Medium</span>
+                      <span className="text-xs text-muted-foreground">Balanced challenge, realistic</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="hard">
+                    <div className="flex flex-col items-start">
+                      <span className="font-semibold">Hard</span>
+                      <span className="text-xs text-muted-foreground">Strict grading, complex events</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
