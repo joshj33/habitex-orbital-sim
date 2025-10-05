@@ -246,23 +246,41 @@ const Results = () => {
                     <h3 className="text-xl font-semibold">{member.name}</h3>
                     <p className="text-sm text-muted-foreground">{member.role}</p>
                   </div>
-                  <div className="flex gap-4 text-sm">
-                    <div className="text-center">
-                      <p className="text-muted-foreground">Health</p>
+                  <div className="grid grid-cols-3 gap-3 text-sm">
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Health</p>
                       <p className={`font-bold ${member.health > 70 ? 'text-success' : member.health > 40 ? 'text-warning' : 'text-destructive'}`}>
                         {member.health.toFixed(0)}%
                       </p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-muted-foreground">Morale</p>
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Morale</p>
                       <p className={`font-bold ${member.morale > 70 ? 'text-success' : member.morale > 40 ? 'text-warning' : 'text-destructive'}`}>
                         {member.morale.toFixed(0)}%
                       </p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-muted-foreground">Performance</p>
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Performance</p>
                       <p className={`font-bold ${member.performance > 70 ? 'text-success' : member.performance > 40 ? 'text-warning' : 'text-destructive'}`}>
                         {member.performance.toFixed(0)}%
+                      </p>
+                    </div>
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Fatigue</p>
+                      <p className={`font-bold ${member.fatigue < 30 ? 'text-success' : member.fatigue < 60 ? 'text-warning' : 'text-destructive'}`}>
+                        {member.fatigue.toFixed(0)}%
+                      </p>
+                    </div>
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Stress</p>
+                      <p className={`font-bold ${member.stress < 30 ? 'text-success' : member.stress < 60 ? 'text-warning' : 'text-destructive'}`}>
+                        {member.stress.toFixed(0)}%
+                      </p>
+                    </div>
+                    <div className="text-center bg-muted/20 rounded p-2">
+                      <p className="text-xs text-muted-foreground">Nutrition</p>
+                      <p className={`font-bold ${member.nutrition > 70 ? 'text-success' : member.nutrition > 40 ? 'text-warning' : 'text-destructive'}`}>
+                        {member.nutrition.toFixed(0)}%
                       </p>
                     </div>
                   </div>

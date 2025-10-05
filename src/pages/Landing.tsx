@@ -40,40 +40,40 @@ const Landing = () => {
 
             {/* Key Features Grid */}
             <div className="grid md:grid-cols-2 gap-6 pt-6">
-              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10">
-                <Rocket className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
+              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10 transition-all duration-300 hover:bg-muted/50 hover:border-primary/30 hover:shadow-neon hover:scale-105 hover:-translate-y-1 cursor-pointer group">
+                <Rocket className="w-8 h-8 text-primary flex-shrink-0 mt-1 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Real-World Science</h3>
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">Real-World Science</h3>
                   <p className="text-sm text-muted-foreground">
                     Based on actual space mission planning and resource requirements
                   </p>
                 </div>
               </div>
               
-              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10">
-                <Target className="w-8 h-8 text-secondary flex-shrink-0 mt-1" />
+              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10 transition-all duration-300 hover:bg-muted/50 hover:border-secondary/30 hover:shadow-neon hover:scale-105 hover:-translate-y-1 cursor-pointer group">
+                <Target className="w-8 h-8 text-secondary flex-shrink-0 mt-1 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Strategic Decisions</h3>
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-secondary transition-colors">Strategic Decisions</h3>
                   <p className="text-sm text-muted-foreground">
                     Balance resources, crew morale, and mission objectives
                   </p>
                 </div>
               </div>
               
-              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10">
-                <Users className="w-8 h-8 text-accent flex-shrink-0 mt-1" />
+              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10 transition-all duration-300 hover:bg-muted/50 hover:border-accent/30 hover:shadow-neon hover:scale-105 hover:-translate-y-1 cursor-pointer group">
+                <Users className="w-8 h-8 text-accent flex-shrink-0 mt-1 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Dynamic Events</h3>
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-accent transition-colors">Dynamic Events</h3>
                   <p className="text-sm text-muted-foreground">
                     Respond to emergencies and unexpected challenges
                   </p>
                 </div>
               </div>
               
-              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10">
-                <LineChart className="w-8 h-8 text-success flex-shrink-0 mt-1" />
+              <div className="flex gap-4 items-start p-4 rounded-lg bg-muted/30 border border-primary/10 transition-all duration-300 hover:bg-muted/50 hover:border-success/30 hover:shadow-neon hover:scale-105 hover:-translate-y-1 cursor-pointer group">
+                <LineChart className="w-8 h-8 text-success flex-shrink-0 mt-1 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Learn & Improve</h3>
+                  <h3 className="font-semibold text-lg mb-2 group-hover:text-success transition-colors">Learn & Improve</h3>
                   <p className="text-sm text-muted-foreground">
                     Get detailed feedback and optimize your habitat design
                   </p>

@@ -5,6 +5,9 @@ export interface CrewMember {
   health: number;
   morale: number;
   performance: number;
+  fatigue: number;
+  stress: number;
+  nutrition: number;
   story: string;
 }
 
@@ -60,6 +63,9 @@ export const generateCrew = (size: number): CrewMember[] => {
       health: 100,
       morale: 100,
       performance: 100,
+      fatigue: 0,
+      stress: 0,
+      nutrition: 100,
       story: "",
     });
   }
@@ -79,29 +85,68 @@ export const updateCrewStats = (
     let healthChange = 0;
     let moraleChange = 0;
     let performanceChange = 0;
+    let fatigueChange = 0;
+    let stressChange = 0;
+    let nutritionChange = 0;
 
-    // Health affected by oxygen, water, food, medical
+    // Nutrition affected by food supply
+    if (stats.food < 60) {
+      nutritionChange -= (60 - stats.food) * 0.2 * difficultyMultiplier;
+    } else if (stats.food > 80) {
+      nutritionChange += 0.3;
+    }
+
+    // Fatigue affected by recreation and sleep areas
+    if (allocations.recreation < 10) {
+      fatigueChange += (10 - allocations.recreation) * 0.4 * difficultyMultiplier;
+    } else {
+      fatigueChange -= 0.5;
+    }
+
+    // Stress affected by multiple factors
+    stressChange += member.fatigue * 0.1;
+    if (stats.oxygen < 50) stressChange += (50 - stats.oxygen) * 0.3 * difficultyMultiplier;
+    if (allocations.recreation < 8) stressChange += (8 - allocations.recreation) * 0.3 * difficultyMultiplier;
+    if (stats.morale < 50) stressChange += (50 - stats.morale) * 0.2;
+
+    // Health affected by oxygen, water, nutrition, medical, fatigue
     if (stats.oxygen < 50) healthChange -= (50 - stats.oxygen) * 0.3 * difficultyMultiplier;
     if (stats.water < 40) healthChange -= (40 - stats.water) * 0.25 * difficultyMultiplier;
-    if (stats.food < 40) healthChange -= (40 - stats.food) * 0.3 * difficultyMultiplier;
+    if (member.nutrition < 40) healthChange -= (40 - member.nutrition) * 0.2;
+    if (member.fatigue > 60) healthChange -= (member.fatigue - 60) * 0.15;
     
     // Medical allocation helps health
-    if (allocations.medical < 10) healthChange -= (10 - allocations.medical) * 0.5 * difficultyMultiplier;
+    if (allocations.medical < 10) {
+      healthChange -= (10 - allocations.medical) * 0.5 * difficultyMultiplier;
+    } else {
+      healthChange += 0.3;
+    }
 
-    // Morale affected by recreation, food quality, general stats
+    // Morale affected by stress, recreation, nutrition
     moraleChange = (stats.morale - 100) * 0.1;
+    if (member.stress > 60) moraleChange -= (member.stress - 60) * 0.2;
     if (allocations.recreation < 10) moraleChange -= (10 - allocations.recreation) * 0.4 * difficultyMultiplier;
+    if (member.nutrition > 80) moraleChange += 0.2;
 
-    // Performance is composite of health and morale
+    // Performance is composite of health, morale, and fatigue
     const newHealth = Math.max(0, Math.min(100, member.health + healthChange));
     const newMorale = Math.max(0, Math.min(100, member.morale + moraleChange));
-    performanceChange = (newHealth + newMorale) / 2 - member.performance;
+    const newFatigue = Math.max(0, Math.min(100, member.fatigue + fatigueChange));
+    const newStress = Math.max(0, Math.min(100, member.stress + stressChange));
+    const newNutrition = Math.max(0, Math.min(100, member.nutrition + nutritionChange));
+    
+    const newPerformance = Math.max(0, Math.min(100, 
+      (newHealth * 0.3 + newMorale * 0.3 + (100 - newFatigue) * 0.2 + (100 - newStress) * 0.1 + newNutrition * 0.1)
+    ));
 
     return {
       ...member,
       health: newHealth,
       morale: newMorale,
-      performance: Math.max(0, Math.min(100, member.performance + performanceChange)),
+      performance: newPerformance,
+      fatigue: newFatigue,
+      stress: newStress,
+      nutrition: newNutrition,
     };
   });
 };
@@ -133,6 +178,27 @@ export const generateCrewStories = (
       storyParts.push(`${member.name} remained positive and became a morale booster for the team.`);
     }
 
+    // Fatigue stories
+    if (member.fatigue > 70) {
+      storyParts.push(`Chronic exhaustion plagued ${member.name}, affecting their daily performance.`);
+    } else if (member.fatigue < 30) {
+      storyParts.push(`${member.name} maintained excellent energy levels with proper rest.`);
+    }
+
+    // Stress stories
+    if (member.stress > 70) {
+      storyParts.push(`High stress levels caused ${member.name} to struggle with decision-making.`);
+    } else if (member.stress < 30) {
+      storyParts.push(`${member.name} managed stress effectively through recreation activities.`);
+    }
+
+    // Nutrition stories
+    if (member.nutrition < 30) {
+      storyParts.push(`Poor nutrition weakened ${member.name}'s immune system and recovery ability.`);
+    } else if (member.nutrition > 85) {
+      storyParts.push(`Excellent nutrition kept ${member.name} in peak physical condition.`);
+    }
+
     // Role-specific stories
     if (member.role === "Engineer" && allocations.maintenance < 10) {
       storyParts.push(`As ${member.role}, they were constantly overwhelmed by repair demands.`);
@@ -140,6 +206,8 @@ export const generateCrewStories = (
       storyParts.push(`As ${member.role}, they struggled with limited medical resources.`);
     } else if (member.role === "Life Support Specialist" && finalStats.oxygen < 50) {
       storyParts.push(`As ${member.role}, they worked overtime to keep oxygen systems operational.`);
+    } else if (member.role === "Commander" && member.performance > 80) {
+      storyParts.push(`As ${member.role}, they provided exceptional leadership throughout the mission.`);
     }
 
     // Performance conclusion

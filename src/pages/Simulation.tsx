@@ -6,6 +6,7 @@ import { Pause, Play, FastForward } from "lucide-react";
 import SimulationStats from "@/components/SimulationStats";
 import HabitatVisual from "@/components/HabitatVisual";
 import EventDialog, { GameEvent } from "@/components/EventDialog";
+import CrewStatsPanel from "@/components/CrewStatsPanel";
 import type { MissionConfig } from "./MissionSetup";
 import type { ZoneAllocations } from "./ZoneAllocation";
 import { generateCrew, updateCrewStats, type CrewMember } from "@/utils/crewGenerator";
@@ -334,8 +335,11 @@ const Simulation = () => {
           </div>
         </Card>
 
-        {/* Stats */}
-        <SimulationStats {...stats} />
+        {/* Stats and Crew */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <SimulationStats {...stats} />
+          <CrewStatsPanel crew={crew} />
+        </div>
 
         {/* Habitat Visual */}
         <HabitatVisual allocations={zoneAllocations} />
